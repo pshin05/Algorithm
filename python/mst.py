@@ -11,8 +11,9 @@ Input : undirected graph G = (V, E) where Ce is cost
 from __future__ import division
 import heapq
 from graph import Graph
+from util import UnionFind
 
-def prim(G):
+def Prim(G):
     """
     Implements Prim's minimum spanning tree algorithm.
     G is assumed to be undirected.
@@ -35,7 +36,7 @@ def prim(G):
     >>> G.addEdge(4, 5, 4)
     >>> G
     <Graph m=9, n=6, edges=[((0, 1), 1), ((1, 2), 6), ((0, 3), 3), ((3, 1), 5), ((1, 4), 1), ((4, 2), 4), ((2, 5), 2), ((3, 4), 1), ((4, 5), 4)] verts=[[0, 2], [0, 1, 3, 4], [1, 5, 6], [2, 3, 7], [4, 5, 7, 8], [6, 8]]>
-    >>> prim(G)
+    >>> Prim(G)
     [0, 4, 7, 5, 6]
     """
     # Holds all edges forming the MST
@@ -70,6 +71,47 @@ def prim(G):
             heapq.heappush(pq, (G.getEdgeCost(edge), edge))
     return MST
         
+
+def Kruskal(G):
+    """
+    Implements Kruskal's minimum spanning tree algorithm.
+    G is assumed to be undirected.
+    Returns a list of edge index forming the MST.
+
+    >>> G = Graph(6, 9)
+    >>> G.addEdge(0, 1, 1)
+    >>> G.addEdge(1, 2, 6)
+    >>> G.addEdge(0, 3, 3)
+    >>> G.addEdge(3, 1, 5)
+    >>> G.addEdge(1, 4, 1)
+    >>> G.addEdge(4, 2, 4)
+    >>> G.addEdge(2, 5, 2)
+    >>> G.addEdge(3, 4, 1)
+    >>> G.addEdge(4, 5, 4)
+    >>> G
+    <Graph m=9, n=6, edges=[((0, 1), 1), ((1, 2), 6), ((0, 3), 3), ((3, 1), 5), ((1, 4), 1), ((4, 2), 4), ((2, 5), 2), ((3, 4), 1), ((4, 5), 4)] verts=[[0, 2], [0, 1, 3, 4], [1, 5, 6], [2, 3, 7], [4, 5, 7, 8], [6, 8]]>
+    >>> Kruskal(G)
+    [0, 4, 7, 6, 5]
+    """
+    # Each vertex starts out as separate trees
+    uf = UnionFind(G.numVerts)
+
+    # Build a minimum priority queue of edges ordered by edge costs.
+    pq = [(G.getEdgeCost(idx), idx) for idx in range(G.numEdges)]
+    heapq.heapify(pq)
+
+    # Keep merging trees until only one's left
+    MST = []
+    while uf.numSets > 1:
+        eCost, eIdx = heapq.heappop(pq)
+        s1, s2 = [uf.find(v) for v in G.getEdge(eIdx)]
+        if s1 != s2:
+            uf.union(s1, s2)
+            MST.append(eIdx)
+    #print uf
+            
+    return MST
+
 
 if __name__ == "__main__":
     import doctest
